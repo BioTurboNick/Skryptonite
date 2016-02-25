@@ -1,0 +1,47 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Resources">
+      <UniqueIdentifier>ffc2611e-6821-4386-bb83-5a1fb9308dc9</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tga;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Scrypt">
+      <UniqueIdentifier>{9ec6e2a8-b086-478e-b0e5-3bcd4d640df1}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="pch.cpp" />
+    <ClCompile Include="DetectInstructionSet.cpp" />
+    <ClCompile Include="ScryptBlock.cpp">
+      <Filter>Scrypt</Filter>
+    </ClCompile>
+    <ClCompile Include="ScryptCore.cpp">
+      <Filter>Scrypt</Filter>
+    </ClCompile>
+    <ClCompile Include="ScryptElement.cpp">
+      <Filter>Scrypt</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="pch.h" />
+    <ClInclude Include="DetectInstructionSet.h" />
+    <ClInclude Include="Salsa20Core.h">
+      <Filter>Scrypt</Filter>
+    </ClInclude>
+    <ClInclude Include="SalsaBlock.h">
+      <Filter>Scrypt</Filter>
+    </ClInclude>
+    <ClInclude Include="ScryptBlock.h">
+      <Filter>Scrypt</Filter>
+    </ClInclude>
+    <ClInclude Include="ScryptCommon.h">
+      <Filter>Scrypt</Filter>
+    </ClInclude>
+    <ClInclude Include="ScryptCore.h">
+      <Filter>Scrypt</Filter>
+    </ClInclude>
+    <ClInclude Include="ScryptElement.h">
+      <Filter>Scrypt</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>
