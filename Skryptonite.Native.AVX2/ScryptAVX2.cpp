@@ -4,7 +4,7 @@
 
 #define _MM256_BLEND_ARG(i0, i1, i2, i3, i4, i5, i6, i7)	i0 | (i1 << 1) | (i2 << 2) | (i3 << 3) | (i4 << 4) | (i5 << 5) | (i6 << 6) | (i7 << 7)
 
-using namespace Skryptonite;
+using namespace Skryptonite::Native;
 
 const __m256i ElementPermuteArgs = _mm256_setr_epi32(4, 1, 6, 3, 0, 5, 2, 7);
 const int ElementBlendArg = _MM256_BLEND_ARG(1, 0, 0, 1, 0, 0, 1, 1);

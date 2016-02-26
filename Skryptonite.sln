@@ -6,6 +6,12 @@ MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Skryptonite", "Skryptonite\Skryptonite.csproj", "{888535E6-294F-48BF-B459-7D9BC8233640}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Skryptonite.Native", "Skryptonite.Native\Skryptonite.Native.vcxproj", "{7A3842B0-9DBC-4342-90F5-D9F2347B5DC3}"
+	ProjectSection(ProjectDependencies) = postProject
+		{2ACABC32-E3E3-44E4-831F-BB7276AA9D84} = {2ACABC32-E3E3-44E4-831F-BB7276AA9D84}
+		{3E6006CB-3E5F-4F6C-A15E-EC63224ADEC7} = {3E6006CB-3E5F-4F6C-A15E-EC63224ADEC7}
+		{A0A106CF-AC96-4F02-A1DF-FDE1C0CFF7DC} = {A0A106CF-AC96-4F02-A1DF-FDE1C0CFF7DC}
+		{DD86F7DC-477F-46FD-AC59-CBD71F63128C} = {DD86F7DC-477F-46FD-AC59-CBD71F63128C}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Skryptonite.Native.AVX2", "Skryptonite.Native.AVX2\Skryptonite.Native.AVX2.vcxproj", "{A0A106CF-AC96-4F02-A1DF-FDE1C0CFF7DC}"
 EndProject
@@ -16,6 +22,9 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Skryptonite.Native.NEON", "Skryptonite.Native.NEON\Skryptonite.Native.NEON.vcxproj", "{DD86F7DC-477F-46FD-AC59-CBD71F63128C}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Skryptonite.Tests", "Skryptonite.Tests\Skryptonite.Tests.csproj", "{CC5D4A74-B193-49E6-9748-069EE63E93D5}"
+	ProjectSection(ProjectDependencies) = postProject
+		{7A3842B0-9DBC-4342-90F5-D9F2347B5DC3} = {7A3842B0-9DBC-4342-90F5-D9F2347B5DC3}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

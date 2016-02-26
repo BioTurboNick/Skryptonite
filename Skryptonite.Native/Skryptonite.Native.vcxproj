@@ -30,7 +30,7 @@
     <ProjectGuid>{7a3842b0-9dbc-4342-90f5-d9f2347b5dc3}</ProjectGuid>
     <Keyword>WindowsRuntimeComponent</Keyword>
     <ProjectName>Skryptonite.Native</ProjectName>
-    <RootNamespace>Skryptonite</RootNamespace>
+    <RootNamespace>Skryptonite.Native</RootNamespace>
     <DefaultLanguage>en-US</DefaultLanguage>
     <MinimumVisualStudioVersion>14.0</MinimumVisualStudioVersion>
     <AppContainerApplication>true</AppContainerApplication>
@@ -142,12 +142,14 @@
       <AdditionalUsingDirectories>$(WindowsSDK_WindowsMetadata);$(AdditionalUsingDirectories)</AdditionalUsingDirectories>
       <AdditionalOptions>/bigobj %(AdditionalOptions)</AdditionalOptions>
       <DisableSpecificWarnings>28204</DisableSpecificWarnings>
-      <SDLCheck>false</SDLCheck>
+      <SDLCheck>
+      </SDLCheck>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
       <AdditionalDependencies>WindowsApp.lib;%(AdditionalDependencies);$(SolutionDir)$(Configuration)\Skryptonite.Native.AVX2\Skryptonite.Native.AVX2.lib;$(SolutionDir)$(Configuration)\Skryptonite.Native.AVX\Skryptonite.Native.AVX.lib;$(SolutionDir)$(Configuration)\Skryptonite.Native.SSE2\Skryptonite.Native.SSE2.lib</AdditionalDependencies>
+      <WindowsMetadataFile>$(OutDir)$(RootNamespace).winmd</WindowsMetadataFile>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">
@@ -177,12 +179,14 @@
       <AdditionalUsingDirectories>$(WindowsSDK_WindowsMetadata);$(AdditionalUsingDirectories)</AdditionalUsingDirectories>
       <AdditionalOptions>/bigobj %(AdditionalOptions)</AdditionalOptions>
       <DisableSpecificWarnings>28204</DisableSpecificWarnings>
-      <SDLCheck>false</SDLCheck>
+      <SDLCheck>
+      </SDLCheck>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
       <AdditionalDependencies>WindowsApp.lib;%(AdditionalDependencies);$(SolutionDir)$(Platform)\$(Configuration)\Skryptonite.Native.NEON\Skryptonite.Native.NEON.lib</AdditionalDependencies>
+      <WindowsMetadataFile>$(OutDir)$(RootNamespace).winmd</WindowsMetadataFile>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -214,7 +218,8 @@
       <BufferSecurityCheck>false</BufferSecurityCheck>
       <EnableEnhancedInstructionSet>NotSet</EnableEnhancedInstructionSet>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
-      <SDLCheck>false</SDLCheck>
+      <SDLCheck>
+      </SDLCheck>
       <Optimization>Full</Optimization>
       <StringPooling>true</StringPooling>
     </ClCompile>
@@ -222,6 +227,7 @@
       <SubSystem>Console</SubSystem>
       <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
       <AdditionalDependencies>WindowsApp.lib;%(AdditionalDependencies);$(SolutionDir)$(Platform)\$(Configuration)\Skryptonite.Native.AVX2\Skryptonite.Native.AVX2.lib;$(SolutionDir)$(Platform)\$(Configuration)\Skryptonite.Native.AVX\Skryptonite.Native.AVX.lib;$(SolutionDir)$(Platform)\$(Configuration)\Skryptonite.Native.SSE2\Skryptonite.Native.SSE2.lib</AdditionalDependencies>
+      <WindowsMetadataFile>$(OutDir)$(RootNamespace).winmd</WindowsMetadataFile>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>

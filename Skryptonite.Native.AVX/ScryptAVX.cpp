@@ -2,7 +2,7 @@
 #include "ScryptAVX.h"
 #include "..\Skryptonite.Native\ScryptCommon.h"
 
-using namespace Skryptonite;
+using namespace Skryptonite::Native;
 
 void ScryptAVX::PrepareData(ScryptElementPtr& workingBuffer, SalsaBlock* source)
 {

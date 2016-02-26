@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "DetectInstructionSet.h"
 
-using namespace Skryptonite;
+using namespace Skryptonite::Native;
 
 // for future: determine cache line size in case it changes from 64 bytes
 

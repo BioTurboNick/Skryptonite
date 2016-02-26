@@ -1,7 +1,8 @@
 #include "pch.h"
+#include <limits>
 #include "ScryptBlock.h"
 
-using namespace Skryptonite;
+using namespace Skryptonite::Native;
 
 ScryptBlock::ScryptBlock(unsigned blockCountPerElement, unsigned elementCount)
 {
@@ -9,6 +10,8 @@ ScryptBlock::ScryptBlock(unsigned blockCountPerElement, unsigned elementCount)
 		throw std::out_of_range("blockCountPerElement must be greater than 0.");
 	if (elementCount == 0)
 		throw std::out_of_range("elementCount must be greater than 0.");
+	if ((std::numeric_limits<unsigned long long>::max)() / blockCountPerElement / elementCount < sizeof(SalsaBlock))
+		throw std::out_of_range("Block size would be larger than 2^64 bytes.");
 
 	_elementCount = elementCount;
 	_blockCountPerElement = blockCountPerElement;

@@ -1,4 +1,5 @@
 ﻿using Microsoft.VisualStudio.TestPlatform.UnitTestFramework;
+using Skryptonite.Native;
 using Windows.Storage.Streams;
 using Windows.Security.Cryptography;
 using static Windows.Security.Cryptography.CryptographicBuffer;
@@ -40,12 +41,12 @@ namespace Skryptonite.Tests
         }
 
         [TestMethod]
-        public void Handle_Out_Of_Memory()
+        public void Throw_On_Bad_Parameters()
         {
             Assert.Inconclusive();
         }
 
-#if INTEL
+#if X86_64
         [TestMethod]
         public void Scrypt_Test_Vectors_AVX2()
         {

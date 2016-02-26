@@ -2,7 +2,7 @@
 #include "ScryptSSE41.h"
 #include "..\Skryptonite.Native\ScryptCommon.h"
 
-using namespace Skryptonite;
+using namespace Skryptonite::Native;
 
 void ScryptSSE41::PrepareData(ScryptElementPtr& workingBuffer, SalsaBlock* source)
 {

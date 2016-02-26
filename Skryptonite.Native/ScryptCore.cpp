@@ -16,7 +16,7 @@
 #include "..\Skryptonite.Native.NEON\ScryptNEON.h"
 #endif
 
-using namespace Skryptonite;
+using namespace Skryptonite::Native;
 using namespace Windows::Storage::Streams;
 using namespace Microsoft::WRL;
 
@@ -32,6 +32,8 @@ ScryptCore::ScryptCore(IBuffer^ data, unsigned elementsCount, unsigned processin
 		throw ref new Platform::InvalidArgumentException("procesingCost must be greater than 0.");
 	if (data->Length % (2 * sizeof(SalsaBlock) * elementsCount) > 0)
 		throw ref new Platform::InvalidArgumentException("data must be non-empty and contain a number of bytes divisible by 128 * elementsCount.");
+	if ((std::numeric_limits<unsigned long long>::max)() / processingCost / elementsCount < sizeof(SalsaBlock))
+		throw ref new Platform::InvalidArgumentException("Block size would be larger than 2^64 bytes with these parameters.");
 	
 	_buffer = data;
 	_salsaBlockCountPerElement = data->Length / (elementsCount * sizeof(SalsaBlock));

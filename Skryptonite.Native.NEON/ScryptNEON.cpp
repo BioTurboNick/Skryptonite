@@ -2,7 +2,7 @@
 #include "ScryptNEON.h"
 #include "..\Skryptonite.Native\ScryptCommon.h"
 
-using namespace Skryptonite;
+using namespace Skryptonite::Native;
 
 void ScryptNEON::PrepareData(ScryptElementPtr& workingBuffer, SalsaBlock* source)
 {
