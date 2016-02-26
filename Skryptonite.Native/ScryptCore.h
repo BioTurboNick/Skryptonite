@@ -22,7 +22,7 @@ namespace Skryptonite
 			random jumps through the large memory block.</param>
 			<exception cref="Platform::InvalidArgumentException">Thrown when <paramref name="data"/> is null or 0 length, when
 			<paramref name="elementsCount"/> or <paramref name="processingCost"/> are 0, or when the byte length of <paramref name="data"/>
-			is not a multiple of 128 * elementsCount.</exception>
+			is not a multiple of 128 * elementsCount, or if an overflow would occur.</exception>
 			*/
 			ScryptCore(Windows::Storage::Streams::IBuffer^ data, unsigned elementsCount, unsigned processingCost);
 

@@ -143,9 +143,10 @@ namespace Skryptonite
         /// <param name="processingCost">
         /// The "N" parameter. Determines how memory- and CPU- intensive the base algorithm is.
         /// Recommended to be large, but may be increased or decreased according to the memory and computing power available.
-        /// Must be greater than 0 and less than 2^64. This is because the index used for internal memory jumps is limited to 64 bytes, and a value of 1 would be self-defeating.
-        /// Should be greater than 1. Many implementations of Scrypt limit themselves to powers of 2 for performance reasons, but performance impact would be small and is minimized by a suitably large
-        /// value of <paramref name="elementLengthMultiplier"/>, so this restriction is not used here; also allows the parameter to be compactly stored as its logarithm base 2.
+        /// Must be greater than 0 and less than 2^58 / (<see cref="ElementUnitLength"/> * <paramref name="elementLengthMultiplier"/>). This is because the large memory block size is "limited" to 2^64 bytes.
+        /// Should be greater than 1. Many implementations of Scrypt limit themselves to powers of 2 for performance reasons, but performance impact is minimized by a suitably large
+        /// value of <paramref name="elementLengthMultiplier"/>, so this restriction is not used here; however, using a power of 2 also allows the parameter to be compactly stored as
+        /// its logarithm base 2.
         /// </param>
         /// <param name="parallelization">
         /// The "p" parameter. The number of independent operations to perform.
@@ -159,6 +160,7 @@ namespace Skryptonite
         /// Choose <param name="elementLengthMultiplier"> to match your memory subsystem's performance, scale <param name="processingCost"> as large as you can handle/as long as you can handle,
         /// scale <param name="parallelization"> to increase computation time while keeping memory usage (per thread) constant.
         /// </remarks>
+        /// <exception cref="ArgumentOutOfRangeException">Thrown when the parameters to not match the expectations described.</exception>
         public Scrypt(uint elementLengthMultiplier, uint processingCost, uint parallelization)
         {
             if (elementLengthMultiplier == 0)
@@ -167,8 +169,10 @@ namespace Skryptonite
                 throw new ArgumentOutOfRangeException(nameof(processingCost), processingCost, "Must be > 0.");
             if (parallelization == 0)
                 throw new ArgumentOutOfRangeException(nameof(processingCost), processingCost, "Must be > 0.");
-            if (parallelization > Convert.ToUInt64(uint.MaxValue) * HashLength / (ElementUnitLength * elementLengthMultiplier))
-                throw new ArgumentOutOfRangeException($"Arguments must satisfy the relationship {parallelization} <= {uint.MaxValue} * {HashLength} / ({ElementUnitLength} * {elementLengthMultiplier}.");
+            if (Convert.ToUInt64(uint.MaxValue) * HashLength / ElementUnitLength / elementLengthMultiplier < parallelization)
+                throw new ArgumentOutOfRangeException($"{nameof(elementLengthMultiplier)}, {nameof(parallelization)}", $"Arguments must satisfy the relationship {nameof(parallelization)} <= {uint.MaxValue} * {HashLength} / ({ElementUnitLength} * {nameof(elementLengthMultiplier)}.");
+            if (ulong.MaxValue / processingCost / ElementUnitLength / elementLengthMultiplier < 64)
+                throw new ArgumentOutOfRangeException($"{nameof(processingCost)}, {nameof(parallelization)}", $"Arguments must satisfy the relationship {ulong.MaxValue} / ({nameof(processingCost)} * {nameof(parallelization)}) >= 64.");
 
             ElementLengthMultiplier = elementLengthMultiplier;
             ProcessingCost = processingCost;
@@ -254,12 +258,15 @@ namespace Skryptonite
         /// <see cref="ElementUnitLength"/> * <see cref="ElementLengthMultiplier"/> * <paramref name="maxThreads"/> for <see cref="Parallelization"/> >= <paramref name="maxThreads"/>.</param>
         /// <returns>A derived key of the desired length.</returns>
         /// <exception cref="ArgumentNullException">Thrown if either <paramref name="key"/> or <paramref name="salt"/> are null.</exception>
+        /// <exception cref="ArgumentOutOfRangeException">Thrown if <paramref name="derivedKeyLength"/> is 0.</exception>
         public IBuffer DeriveKey(IBuffer key, IBuffer salt, uint derivedKeyLength)
         {
             if (key == null)
                 throw new ArgumentNullException(nameof(key));
-            if (key == null)
+            if (salt == null)
                 throw new ArgumentNullException(nameof(salt));
+            if (derivedKeyLength == 0)
+                throw new ArgumentOutOfRangeException(nameof(derivedKeyLength), "Must be > 0.");
 
             Contract.Ensures(Contract.Result<IBuffer>() != null);
 
@@ -330,9 +337,11 @@ namespace Skryptonite
         [ContractInvariantMethod]
         void ObjectInvariant()
         {
+            Contract.Invariant(processingCost > 0);
             Contract.Invariant(ProcessingCost > 0);
             Contract.Invariant(Parallelization > 0);
             Contract.Invariant(ElementLengthMultiplier > 0);
+            Contract.Invariant(maxThreads > 0);
             Contract.Invariant(MaxThreads > 0);
             Contract.Invariant(MaxThreads <= Environment.ProcessorCount);
         }

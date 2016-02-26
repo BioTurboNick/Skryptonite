@@ -3,6 +3,7 @@ using Skryptonite.Native;
 using Windows.Storage.Streams;
 using Windows.Security.Cryptography;
 using static Windows.Security.Cryptography.CryptographicBuffer;
+using System;
 
 namespace Skryptonite.Tests
 {
@@ -41,9 +42,79 @@ namespace Skryptonite.Tests
         }
 
         [TestMethod]
-        public void Throw_On_Bad_Parameters()
+        public void Scrypt_Throws_On_Bad_Parameters()
         {
-            Assert.Inconclusive();
+            uint elementLengthMultiplier = 16;
+            uint processingCost = 8192;
+
+            Assert.ThrowsException<ArgumentOutOfRangeException>(
+                () => new Scrypt(0, processingCost, 1)
+                );
+            Assert.ThrowsException<ArgumentOutOfRangeException>(
+                () => new Scrypt(elementLengthMultiplier, 0, 1)
+                );
+            Assert.ThrowsException<ArgumentOutOfRangeException>(
+                () => new Scrypt(elementLengthMultiplier, processingCost, 0)
+                );
+            Assert.ThrowsException<ArgumentOutOfRangeException>(
+                () => new Scrypt(elementLengthMultiplier, processingCost, 0)
+                );
+            Assert.ThrowsException<ArgumentOutOfRangeException>(
+                () => {
+                    uint badParallelization = (uint)(Convert.ToUInt64(uint.MaxValue) * Scrypt.HashLength / (Scrypt.ElementUnitLength * elementLengthMultiplier)) + 1;
+                    new Scrypt(elementLengthMultiplier, processingCost, badParallelization);
+                });
+            Assert.ThrowsException<ArgumentOutOfRangeException>(
+                () => {
+                    uint badElementLengthMultiplier = uint.MaxValue / Scrypt.ElementUnitLength;
+                    uint badProcessingCost = (uint)(ulong.MaxValue / Scrypt.ElementUnitLength / badElementLengthMultiplier / 64) + 1;
+                    new Scrypt(badElementLengthMultiplier, badProcessingCost, 1);
+                });
+        }
+
+        [TestMethod]
+        public void ScryptCore_Throws_On_Bad_Parameters()
+        {
+            IBuffer buffer128 = DecodeFromHexString("0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef");
+            IBuffer buffer136 = DecodeFromHexString("0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef");
+            IBuffer buffer120 = DecodeFromHexString("0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef");
+
+            Assert.ThrowsException<ArgumentException>(
+                    () => new ScryptCore(null, 1, 8192)
+                );
+            Assert.ThrowsException<ArgumentException>(
+                    () => new ScryptCore(new Windows.Storage.Streams.Buffer(0), 1, 8192)
+                );
+            Assert.ThrowsException<ArgumentException>(
+                    () => new ScryptCore(buffer128, 0, 8192)
+                );
+            Assert.ThrowsException<ArgumentException>(
+                    () => new ScryptCore(buffer128, 1, 0)
+                );
+            Assert.ThrowsException<ArgumentException>(
+                    () => new ScryptCore(buffer120, 1, 8192)
+                );
+            Assert.ThrowsException<ArgumentException>(
+                    () => new ScryptCore(buffer136, 1, 8192)
+                );
+            new ScryptCore(buffer128, 1, 8192).SMix(0);
+            Assert.ThrowsException<ArgumentException>(
+                    () => new ScryptCore(buffer128, 1, 8192).SMix(1)
+                );
+        }
+
+        [TestMethod]
+        public void DeriveKey_Throws_On_Bad_Parameters()
+        {
+            Assert.ThrowsException<ArgumentNullException>(
+                    () => new Scrypt(1, 16, 1).DeriveKey(null, new Windows.Storage.Streams.Buffer(0), 64)
+                );
+            Assert.ThrowsException<ArgumentNullException>(
+                    () => new Scrypt(1, 16, 1).DeriveKey(new Windows.Storage.Streams.Buffer(0), null, 64)
+                );
+            Assert.ThrowsException<ArgumentOutOfRangeException>(
+                    () => new Scrypt(1, 16, 1).DeriveKey(new Windows.Storage.Streams.Buffer(0), new Windows.Storage.Streams.Buffer(0), 0)
+                );
         }
 
 #if X86_64
