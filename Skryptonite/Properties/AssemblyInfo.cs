@@ -6,9 +6,9 @@ using System.Runtime.InteropServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("Skryptonite")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyDescription("A C#-wrapped native implementation of the scrypt sequential memory-hard password-based key derivation function (PBKDF) invented by Colin Percival for Universal Windows Platform applications. x86, x64, and ARM binaries are available. Also provides a function to select optimal parameters for your memory/time requirements.")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
+[assembly: AssemblyCompany("Nicholas C. Bauer")]
 [assembly: AssemblyProduct("Skryptonite")]
 [assembly: AssemblyCopyright("Copyright ©  2016")]
 [assembly: AssemblyTrademark("")]
