@@ -184,17 +184,21 @@ namespace Skryptonite
         /// <summary>
         /// Produces a <see cref="Scrypt"/> with factors optimized for memory usage and time.
         /// </summary>
-        /// <param name="desiredMemoryUsage">The desired large memory block size, in bytes. Must be divisible by <see cref="ElementUnitLength"/> * 16.</param>
+        /// <param name="desiredMemoryUsage">The desired large memory block size, in bytes.</param>
         /// <param name="desiredComputationTime">The desired amount of computation time to use, in milliseconds.</param>
         /// <remarks>
         /// The amount of memory consumed by the large memory block is guaranteed to be as close to <paramref name="desiredMemoryUsage"/> as possible
-        /// without going over, though will not be less than 32 kB.
-        /// The desired computation time will be met as closely as possible. Be aware that other processes running on your computer may reduce the
-        /// output parameters. The amount of memory consumed by the large memory block will be reduced if necessary.
+        /// without going over, though will not be less than 32 kB. At least 16 MB is recommended.
+        /// The desired computation time will be met as closely as possible. Be aware that other processes running on your device can affect the
+        /// output parameters; if your system is under heavy load, the parameters chosen will be weaker than those chosen when your system is idle.
+        /// The amount of memory consumed by the large memory block will be reduced if necessary to match the time constraint.
+        /// Automatically accounts for multithreaded processing.
         /// </remarks>
         public static Scrypt CreateOptimal(uint desiredMemoryUsage, uint desiredComputationTime)
         {
             Contract.Ensures(Contract.Result<Scrypt>() != null);
+            Contract.Ensures(Contract.Result<Scrypt>().ElementLengthMultiplier == DefaultElementLengthMultiplier);
+            Contract.Ensures(Contract.Result<Scrypt>().ProcessingCost >= 16);
 
             uint targetProcessingCost = Math.Max(16, desiredMemoryUsage / (ElementUnitLength * DefaultElementLengthMultiplier));
 
@@ -221,7 +225,7 @@ namespace Skryptonite
 
             Contract.Assume(timer.ElapsedMilliseconds <= uint.MaxValue);
 
-            /// determine the optimal parallelization parameter
+            // determine the optimal parallelization parameter
             int threads = Math.Max(1, Environment.ProcessorCount - 1);
 
             uint targetParallelization = Math.Max(1, desiredComputationTime / (uint)timer.ElapsedMilliseconds);
@@ -235,7 +239,7 @@ namespace Skryptonite
 
                 Contract.Assume(timer.ElapsedMilliseconds <= uint.MaxValue);
 
-                uint speedupFactor = desiredComputationTime / (uint)timer.ElapsedMilliseconds;
+                uint speedupFactor = Math.Max(1, desiredComputationTime / (uint)timer.ElapsedMilliseconds);
 
                 targetParallelization *= speedupFactor;
             }
@@ -326,7 +330,7 @@ namespace Skryptonite
                 for (int i = 0; i < value.Length; i++)
                     writer.WriteByte(0);
 
-                writer.StoreAsync().GetResults();
+                writer.StoreAsync().AsTask().GetAwaiter().GetResult();
             }
         }
 

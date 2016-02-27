@@ -36,9 +36,17 @@ namespace Skryptonite.Tests
         }
 
         [TestMethod]
-        public void CreateOptimal__Correct()
+        public void CreateOptimal__Works()
         {
-            Assert.Inconclusive();
+            var scrypt = Scrypt.CreateOptimal(16777216, 2000);
+
+            Assert.AreEqual((uint)8192, scrypt.ProcessingCost);
+            Assert.AreEqual((uint)16, scrypt.ElementLengthMultiplier);
+
+            scrypt = Scrypt.CreateOptimal(1073741824, 0);
+
+            Assert.AreEqual((uint)16, scrypt.ProcessingCost);
+            Assert.AreEqual((uint)16, scrypt.ElementLengthMultiplier);
         }
 
         [TestMethod]
