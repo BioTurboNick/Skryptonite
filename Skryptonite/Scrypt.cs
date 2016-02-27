@@ -5,9 +5,11 @@ using System.Diagnostics.Contracts;
 using System.IO;
 using System.Runtime.InteropServices.WindowsRuntime;
 using System.Threading.Tasks;
+using Windows.ApplicationModel;
 using Windows.Security.Cryptography;
 using Windows.Security.Cryptography.Core;
 using Windows.Storage.Streams;
+using Windows.System;
 using static Windows.Security.Cryptography.CryptographicBuffer;
 
 namespace Skryptonite
@@ -35,6 +37,8 @@ namespace Skryptonite
 
         const uint DefaultElementLengthMultiplier = 16;
         static readonly KeyDerivationAlgorithmProvider pbkdf2Sha256 = KeyDerivationAlgorithmProvider.OpenAlgorithm(KeyDerivationAlgorithmNames.Pbkdf2Sha256);
+        static readonly bool Is64bit = Package.Current.Id.Architecture == ProcessorArchitecture.X64;
+        static readonly ulong memoryLimit = Is64bit ? ulong.MaxValue : uint.MaxValue;
 
         #endregion
 
@@ -143,7 +147,7 @@ namespace Skryptonite
         /// <param name="processingCost">
         /// The "N" parameter. Determines how memory- and CPU- intensive the base algorithm is.
         /// Recommended to be large, but may be increased or decreased according to the memory and computing power available.
-        /// Must be greater than 0 and less than 2^58 / (<see cref="ElementUnitLength"/> * <paramref name="elementLengthMultiplier"/>). This is because the large memory block size is "limited" to 2^64 bytes.
+        /// Must be greater than 0 and less than 2^32 / (<see cref="ElementUnitLength"/> * <paramref name="elementLengthMultiplier"/>) / 64. This is because the large memory block size is limited to 2^32 bytes.
         /// Should be greater than 1. Many implementations of Scrypt limit themselves to powers of 2 for performance reasons, but performance impact is minimized by a suitably large
         /// value of <paramref name="elementLengthMultiplier"/>, so this restriction is not used here; however, using a power of 2 also allows the parameter to be compactly stored as
         /// its logarithm base 2.
@@ -171,8 +175,8 @@ namespace Skryptonite
                 throw new ArgumentOutOfRangeException(nameof(processingCost), processingCost, "Must be > 0.");
             if (Convert.ToUInt64(uint.MaxValue) * HashLength / ElementUnitLength / elementLengthMultiplier < parallelization)
                 throw new ArgumentOutOfRangeException($"{nameof(elementLengthMultiplier)}, {nameof(parallelization)}", $"Arguments must satisfy the relationship {nameof(parallelization)} <= {uint.MaxValue} * {HashLength} / ({ElementUnitLength} * {nameof(elementLengthMultiplier)}.");
-            if (ulong.MaxValue / processingCost / ElementUnitLength / elementLengthMultiplier < 64)
-                throw new ArgumentOutOfRangeException($"{nameof(processingCost)}, {nameof(parallelization)}", $"Arguments must satisfy the relationship {ulong.MaxValue} / ({nameof(processingCost)} * {nameof(parallelization)}) >= 64.");
+            if (memoryLimit / processingCost / elementLengthMultiplier < ElementUnitLength)
+                throw new ArgumentOutOfRangeException($"{nameof(processingCost)}, {nameof(parallelization)}", $"Arguments must satisfy the relationship {memoryLimit} / ({nameof(processingCost)} * {nameof(parallelization)}) >= {nameof(ElementUnitLength)}.");
 
             ElementLengthMultiplier = elementLengthMultiplier;
             ProcessingCost = processingCost;
@@ -186,6 +190,8 @@ namespace Skryptonite
         /// </summary>
         /// <param name="desiredMemoryUsage">The desired large memory block size, in bytes.</param>
         /// <param name="desiredComputationTime">The desired amount of computation time to use, in milliseconds.</param>
+        /// <returns>The optimized Scrypt object. May be null in the event that your device is severely constrained (less than ~32 kB available
+        /// for the large memory block.)</returns>
         /// <remarks>
         /// The amount of memory consumed by the large memory block is guaranteed to be as close to <paramref name="desiredMemoryUsage"/> as possible
         /// without going over, though will not be less than 32 kB. At least 16 MB is recommended.
@@ -196,11 +202,12 @@ namespace Skryptonite
         /// </remarks>
         public static Scrypt CreateOptimal(uint desiredMemoryUsage, uint desiredComputationTime)
         {
-            Contract.Ensures(Contract.Result<Scrypt>() != null);
-            Contract.Ensures(Contract.Result<Scrypt>().ElementLengthMultiplier == DefaultElementLengthMultiplier);
-            Contract.Ensures(Contract.Result<Scrypt>().ProcessingCost >= 16);
+            Contract.Ensures(Contract.Result<Scrypt>() == null || Contract.Result<Scrypt>().ElementLengthMultiplier == DefaultElementLengthMultiplier);
+            Contract.Ensures(Contract.Result<Scrypt>() == null || Contract.Result<Scrypt>().ProcessingCost >= 16);
 
-            uint targetProcessingCost = Math.Max(16, desiredMemoryUsage / (ElementUnitLength * DefaultElementLengthMultiplier));
+            uint minProcessingCost = 16;
+            uint maxProcessingCost = Math.Max(minProcessingCost, desiredMemoryUsage / (ElementUnitLength * DefaultElementLengthMultiplier));
+            uint targetProcessingCost = minProcessingCost;
 
             IBuffer password = ConvertStringToBinary("password", BinaryStringEncoding.Utf8);
             IBuffer salt = ConvertStringToBinary("salt", BinaryStringEncoding.Utf8);
@@ -209,40 +216,64 @@ namespace Skryptonite
 
             Scrypt scrypt;
 
+            bool noMoreMemory = false;
+            uint oneIterationMilliseconds = 0;
+
             // determine the optimal processing cost parameter
-            for (uint i = 16; i <= targetProcessingCost; i *= 2)
+            for (uint i = minProcessingCost; i <= maxProcessingCost; i *= 2)
             {
                 scrypt = new Scrypt(DefaultElementLengthMultiplier, i, 1);
-                timer.Restart();
-                scrypt.DeriveKey(password, salt, 32);
-                timer.Stop();
-                if (timer.ElapsedMilliseconds > desiredComputationTime)
+
+                try
                 {
+                    timer.Restart();
+                    scrypt.DeriveKey(password, salt, 32);
+                    timer.Stop();
+
+                    Contract.Assume(timer.ElapsedMilliseconds <= uint.MaxValue);
+
+                    oneIterationMilliseconds = (uint)timer.ElapsedMilliseconds;
                     targetProcessingCost = i;
+
+                    if (oneIterationMilliseconds > desiredComputationTime)
+                        break;
+                }
+                catch (OutOfMemoryException)
+                {
+                    if (i == minProcessingCost)
+                        return null;
+
+                    noMoreMemory = true;                    
                     break;
+                }
+            }          
+
+            uint threadedIterationMilliseconds = oneIterationMilliseconds;
+
+            // determine how much parallel processing is possible within memory constraints
+            int threads = noMoreMemory ? 1 : Math.Max(1, Environment.ProcessorCount - 1);
+            while (threads > 1)
+            {
+                try
+                {
+                    scrypt = new Scrypt(DefaultElementLengthMultiplier, targetProcessingCost, (uint)threads) { MaxThreads = threads };
+                    timer.Restart();
+                    scrypt.DeriveKey(password, salt, 32);
+                    timer.Stop();
+
+                    Contract.Assume(timer.ElapsedMilliseconds <= uint.MaxValue);
+
+                    threadedIterationMilliseconds = (uint)timer.ElapsedMilliseconds;
+
+                    break;
+                }
+                catch (OutOfMemoryException)
+                {
+                    threads--;
                 }
             }
 
-            Contract.Assume(timer.ElapsedMilliseconds <= uint.MaxValue);
-
-            // determine the optimal parallelization parameter
-            int threads = Math.Max(1, Environment.ProcessorCount - 1);
-
-            uint targetParallelization = Math.Max(1, desiredComputationTime / (uint)timer.ElapsedMilliseconds);
-
-            if (threads > 1)
-            {
-                scrypt = new Scrypt(DefaultElementLengthMultiplier, targetProcessingCost, targetParallelization) { MaxThreads = threads };
-                timer.Restart();
-                scrypt.DeriveKey(password, salt, 32);
-                timer.Stop();
-
-                Contract.Assume(timer.ElapsedMilliseconds <= uint.MaxValue);
-
-                uint speedupFactor = Math.Max(1, desiredComputationTime / (uint)timer.ElapsedMilliseconds);
-
-                targetParallelization *= speedupFactor;
-            }
+            uint targetParallelization = Math.Max(1, (uint)threads * desiredComputationTime / threadedIterationMilliseconds);
 
             return new Scrypt(DefaultElementLengthMultiplier, targetProcessingCost, targetParallelization) { MaxThreads = threads };
         }
@@ -257,9 +288,8 @@ namespace Skryptonite
         /// <param name="key">The input key (e.g. user password).</param>
         /// <param name="salt">The salt. Used to thwart precomputation attacks.</param>
         /// <param name="derivedKeyLength">The desired length of the derived key in bytes. Must be greater than 0.</param>
-        /// <param name="maxThreads">The maximum number of threads to run in parallel. Only matters if <see cref="Parallelization"/> > 1.
         /// 0 sets it to the logical processor count. Default is 0. Note that memory requirements will be approximately
-        /// <see cref="ElementUnitLength"/> * <see cref="ElementLengthMultiplier"/> * <paramref name="maxThreads"/> for <see cref="Parallelization"/> >= <paramref name="maxThreads"/>.</param>
+        /// <see cref="ElementUnitLength"/> * <see cref="ElementLengthMultiplier"/> * <paramref name="maxThreads"/> for <see cref="Parallelization"/> &gt;= <paramref name="maxThreads"/>.</param>
         /// <returns>A derived key of the desired length.</returns>
         /// <exception cref="ArgumentNullException">Thrown if either <paramref name="key"/> or <paramref name="salt"/> are null.</exception>
         /// <exception cref="ArgumentOutOfRangeException">Thrown if <paramref name="derivedKeyLength"/> is 0.</exception>
@@ -271,7 +301,7 @@ namespace Skryptonite
                 throw new ArgumentNullException(nameof(salt));
             if (derivedKeyLength == 0)
                 throw new ArgumentOutOfRangeException(nameof(derivedKeyLength), "Must be > 0.");
-
+            
             Contract.Ensures(Contract.Result<IBuffer>() != null);
 
             IBuffer bufferData = OneRoundPbkdf2Sha256(key, salt, WorkingBufferLength);
@@ -280,7 +310,26 @@ namespace Skryptonite
 
             var options = new ParallelOptions() { MaxDegreeOfParallelism = maxThreads };
 
-            Parallel.For(0, Parallelization, options, (long i) => scryptCore.SMix((uint)i));
+            try
+            {
+                Parallel.For(0, Parallelization, options, (long i) => scryptCore.SMix((uint)i));
+            }
+            catch (AggregateException ex)
+            {
+                bool outOfMemory = false;
+                foreach (var innerEx in ex.InnerExceptions)
+                    if (innerEx is OutOfMemoryException)
+                    {
+                        outOfMemory = true;
+                        break;
+                    }
+
+                if (outOfMemory)
+                {
+                    Erase(bufferData);
+                    throw new OutOfMemoryException("Unable to allocate enough memory to perform Scrypt for these parameters.");
+                }
+            }
 
             IBuffer derivedKey = OneRoundPbkdf2Sha256(key, bufferData, derivedKeyLength);
 

@@ -20,7 +20,7 @@ ScryptElement::ScryptElement(unsigned blockCount, unsigned integerifyDivisor)
 	_data = reinterpret_cast<SalsaBlock*>(_aligned_malloc(_length, Alignment));
 
 	if (_data == NULL)
-		throw std::exception("Memory allocation for ScryptElement failed.");
+		throw std::bad_alloc();
 }
 
 ScryptElement::~ScryptElement()

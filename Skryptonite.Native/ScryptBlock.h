@@ -46,7 +46,7 @@ namespace Skryptonite
 
 			unsigned _blockCountPerElement;
 			unsigned _elementCount;
-			unsigned long long _length;
+			size_t _length;
 
 			SalsaBlock* _data;
 		};

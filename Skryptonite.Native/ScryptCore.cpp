@@ -30,10 +30,12 @@ ScryptCore::ScryptCore(IBuffer^ data, unsigned elementsCount, unsigned processin
 		throw ref new Platform::InvalidArgumentException("elementsCount must be greater than 0.");
 	if (processingCost == 0)
 		throw ref new Platform::InvalidArgumentException("procesingCost must be greater than 0.");
+	if ((std::numeric_limits<unsigned>::max)() / elementsCount < 2 * sizeof(SalsaBlock))
+		throw ref new Platform::InvalidArgumentException("128 * elementsCount must be less than 2^32.");
 	if (data->Length % (2 * sizeof(SalsaBlock) * elementsCount) > 0)
 		throw ref new Platform::InvalidArgumentException("data must be non-empty and contain a number of bytes divisible by 128 * elementsCount.");
-	if ((std::numeric_limits<unsigned long long>::max)() / processingCost / (data->Length / elementsCount) < sizeof(SalsaBlock))
-		throw ref new Platform::InvalidArgumentException("Block size would be larger than 2^64 bytes with these parameters.");
+	if ((std::numeric_limits<size_t>::max)() / processingCost < data->Length / elementsCount )
+		throw ref new Platform::InvalidArgumentException("processingCost * (data->Length / elementsCount) must be less than addressable memory!");
 	
 	_buffer = data;
 	_salsaBlockCountPerElement = data->Length / (elementsCount * sizeof(SalsaBlock));
@@ -104,9 +106,21 @@ void ScryptCore::SMix(unsigned elementIndex)
 
 	SalsaBlock* const sourceData = _data + elementIndex * _salsaBlockCountPerElement;
 
-	ScryptElementPtr workingBuffer = static_cast<ScryptElementPtr>(std::make_unique<ScryptElement>(_salsaBlockCountPerElement, _processingCost));
-	ScryptElementPtr shuffleBuffer = static_cast<ScryptElementPtr>(std::make_unique<ScryptElement>(_salsaBlockCountPerElement, _processingCost));
-	ScryptBlockPtr scryptBlock = static_cast<ScryptBlockPtr>(std::make_unique<ScryptBlock>(_salsaBlockCountPerElement, _processingCost));
+	ScryptElementPtr workingBuffer;
+	ScryptElementPtr shuffleBuffer;
+	ScryptBlockPtr scryptBlock;
+
+	try
+	{
+		workingBuffer = static_cast<ScryptElementPtr>(std::make_unique<ScryptElement>(_salsaBlockCountPerElement, _processingCost));
+		shuffleBuffer = static_cast<ScryptElementPtr>(std::make_unique<ScryptElement>(_salsaBlockCountPerElement, _processingCost));
+		scryptBlock = static_cast<ScryptBlockPtr>(std::make_unique<ScryptBlock>(_salsaBlockCountPerElement, _processingCost));
+	}
+	catch (std::bad_alloc)
+	{
+		throw ref new Platform::OutOfMemoryException("Unable to allocate enough memory to complete SMix.");
+	}
+	
 	
 	PrepareData(workingBuffer, sourceData);
 	FillScryptBlock(workingBuffer, scryptBlock, shuffleBuffer);

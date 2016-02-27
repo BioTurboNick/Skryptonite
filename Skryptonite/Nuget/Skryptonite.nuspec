@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+  <metadata minClientVersion="3.2">
+    <id>Skryptonite</id>
+    <version>1.0.0-alpha3</version>
+    <title>Skryptonite</title>
+    <authors>Nicholas C. Bauer</authors>
+    <owners>Nicholas C. Bauer</owners>
+    <licenseUrl>https://github.com/BioTurboNick/Skryptonite/blob/master/LICENSE.md</licenseUrl>
+    <projectUrl>https://github.com/BioTurboNick/Skryptonite</projectUrl>
+    <requireLicenseAcceptance>true</requireLicenseAcceptance>
+    <description>
+      A C#-wrapped native implementation of the scrypt sequential memory-hard password-based key derivation function (PBKDF) invented by Colin Percival for Universal Windows Platform applications. x86, x64, and ARM binaries are available. Also provides a function to select optimal parameters for your memory/time requirements.
+    </description>
+    <summary>C#/Native Scrypt UWP Component</summary>
+    <releaseNotes>Initial release.</releaseNotes>
+    <copyright>Copyright 2016</copyright>
+    <tags>Cryptography Security Scrypt PBKDF Native UWP</tags>
+  </metadata>
+  <files>
+    <file src="..\bin\x86\Release\Skryptonite.*" target ="runtimes\win10-x86\lib\uap10.0" />
+    <file src="..\bin\x86\Release\Skryptonite.Native.*" target ="runtimes\win10-x86\native" />
+
+    <file src="..\bin\x64\Release\Skryptonite.*" target ="runtimes\win10-x64\lib\uap10.0" />
+    <file src="..\bin\x64\Release\Skryptonite.Native.*" target ="runtimes\win10-x64\native" />
+
+    <file src="..\bin\ARM\Release\Skryptonite.*" target ="runtimes\win10-arm\lib\uap10.0" />
+    <file src="..\bin\ARM\Release\Skryptonite.Native.*" target ="runtimes\win10-arm\native" />
+  </files>
+</package>
