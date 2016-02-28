@@ -148,6 +148,7 @@ publish/
 !**/packages/build/
 # Uncomment if necessary however generally it will be regenerated when needed
 #!**/packages/repositories.config
+!Nuget/build/uap10.0/Skryptonite.targets
 
 # Windows Azure Build Output
 csx/
@@ -212,3 +213,4 @@ _Pvt_Extensions/
 ModelManifest.xml
 
 *.VC.opendb
+/Skryptonite/nuget.exe

@@ -103,6 +103,7 @@ namespace Skryptonite
         /// <summary>
         /// Gets or sets the number of threads the algorithm will use. Must be between 1 and <see cref="Parallelization"/>, inclusive.
         /// </summary>
+        /// <exception cref="ArgumentOutOfRangeException">Thrown when the value to be set is &lt;= 0 or else &gt; <see cref="Parallelization"/></exception>
         public int MaxThreads
         {
             get
@@ -113,8 +114,9 @@ namespace Skryptonite
             }
             set
             {
-                Contract.Requires(value > 0);
-                Contract.Requires(value <= Parallelization);
+                if (value <= 0 || value > Parallelization)
+                    throw new ArgumentOutOfRangeException(nameof(value), value, $"Must be between 1 and {nameof(Parallelization)}, inclusive.");
+
                 maxThreads = value;
             }
         }
@@ -161,8 +163,8 @@ namespace Skryptonite
         /// However, this would only practically be true when memory requirements reach 512 GB, an amount unlikely to be reached anytime soon.
         /// </param>
         /// <remarks>
-        /// Choose <param name="elementLengthMultiplier"> to match your memory subsystem's performance, scale <param name="processingCost"> as large as you can handle/as long as you can handle,
-        /// scale <param name="parallelization"> to increase computation time while keeping memory usage (per thread) constant.
+        /// Choose <paramref name="elementLengthMultiplier"/> to match your memory subsystem's performance, scale <paramref name="processingCost"/> as large as you can handle/as long as you can handle,
+        /// scale <paramref name="parallelization"/> to increase computation time while keeping memory usage (per thread) constant.
         /// </remarks>
         /// <exception cref="ArgumentOutOfRangeException">Thrown when the parameters to not match the expectations described.</exception>
         public Scrypt(uint elementLengthMultiplier, uint processingCost, uint parallelization)
@@ -246,7 +248,7 @@ namespace Skryptonite
                     noMoreMemory = true;                    
                     break;
                 }
-            }          
+            }
 
             uint threadedIterationMilliseconds = oneIterationMilliseconds;
 
@@ -275,7 +277,7 @@ namespace Skryptonite
 
             uint targetParallelization = Math.Max(1, (uint)threads * desiredComputationTime / threadedIterationMilliseconds);
 
-            return new Scrypt(DefaultElementLengthMultiplier, targetProcessingCost, targetParallelization) { MaxThreads = threads };
+            return new Scrypt(DefaultElementLengthMultiplier, targetProcessingCost, targetParallelization) { MaxThreads = (int)Math.Min(threads, targetParallelization) };
         }
 
         #endregion
@@ -288,11 +290,10 @@ namespace Skryptonite
         /// <param name="key">The input key (e.g. user password).</param>
         /// <param name="salt">The salt. Used to thwart precomputation attacks.</param>
         /// <param name="derivedKeyLength">The desired length of the derived key in bytes. Must be greater than 0.</param>
-        /// 0 sets it to the logical processor count. Default is 0. Note that memory requirements will be approximately
-        /// <see cref="ElementUnitLength"/> * <see cref="ElementLengthMultiplier"/> * <paramref name="maxThreads"/> for <see cref="Parallelization"/> &gt;= <paramref name="maxThreads"/>.</param>
         /// <returns>A derived key of the desired length.</returns>
         /// <exception cref="ArgumentNullException">Thrown if either <paramref name="key"/> or <paramref name="salt"/> are null.</exception>
         /// <exception cref="ArgumentOutOfRangeException">Thrown if <paramref name="derivedKeyLength"/> is 0.</exception>
+        /// <exception cref="OutOfMemoryException">Thrown if enough memory cannot be allocated to perform Scrypt with the given parameters at this time.</exception>
         public IBuffer DeriveKey(IBuffer key, IBuffer salt, uint derivedKeyLength)
         {
             if (key == null)
@@ -327,7 +328,7 @@ namespace Skryptonite
                 if (outOfMemory)
                 {
                     Erase(bufferData);
-                    throw new OutOfMemoryException("Unable to allocate enough memory to perform Scrypt for these parameters.");
+                    throw new OutOfMemoryException("Unable to allocate enough memory to perform Scrypt for these parameters at this time.");
                 }
             }
 

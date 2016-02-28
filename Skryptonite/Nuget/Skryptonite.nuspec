@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
   <metadata minClientVersion="3.2">
     <id>Skryptonite</id>
-    <version>1.0.0-alpha3</version>
+    <version>1.0.1</version>
     <title>Skryptonite</title>
     <authors>Nicholas C. Bauer</authors>
     <owners>Nicholas C. Bauer</owners>
@@ -18,13 +18,14 @@
     <tags>Cryptography Security Scrypt PBKDF Native UWP</tags>
   </metadata>
   <files>
-    <file src="..\bin\x86\Release\Skryptonite.*" target ="runtimes\win10-x86\lib\uap10.0" />
-    <file src="..\bin\x86\Release\Skryptonite.Native.*" target ="runtimes\win10-x86\native" />
-
-    <file src="..\bin\x64\Release\Skryptonite.*" target ="runtimes\win10-x64\lib\uap10.0" />
-    <file src="..\bin\x64\Release\Skryptonite.Native.*" target ="runtimes\win10-x64\native" />
-
-    <file src="..\bin\ARM\Release\Skryptonite.*" target ="runtimes\win10-arm\lib\uap10.0" />
-    <file src="..\bin\ARM\Release\Skryptonite.Native.*" target ="runtimes\win10-arm\native" />
+    <file src="build\uap10.0\Skryptonite.targets" target="build\native" />
+    
+    <file src="..\bin\x86\Release\Skryptonite.XML" target="lib\uap10.0" />
+    <file src="..\bin\Reference\Skryptonite.winmd" target="lib\uap10.0" />
+    <file src="..\bin\Reference\Skryptonite.Native.winmd" target="lib\uap10.0" />
+    
+    <file src="..\..\Release\Skryptonite.Native\Skryptonite.Native.dll" target="runtimes\win10-x86\native" />
+    <file src="..\..\x64\Release\Skryptonite.Native\Skryptonite.Native.dll" target="runtimes\win10-x64\native" />
+    <file src="..\..\ARM\Release\Skryptonite.Native\Skryptonite.Native.dll" target="runtimes\win10-arm\native" />
   </files>
 </package>
