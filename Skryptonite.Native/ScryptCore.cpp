@@ -155,3 +155,8 @@ void ScryptCore::MixWithScryptBlock(ScryptElementPtr& workingBuffer, const Scryp
 		XorAndMixBlocks(workingBuffer, (*scryptBlock)[j], shuffleBuffer);
 	}
 }
+
+void ScryptCore::EraseBuffer()
+{
+	memset(_data, 0, _buffer->Length);
+}

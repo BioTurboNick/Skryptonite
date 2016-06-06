@@ -327,14 +327,14 @@ namespace Skryptonite
 
                 if (outOfMemory)
                 {
-                    Erase(bufferData);
+                    scryptCore.EraseBuffer();
                     throw new OutOfMemoryException("Unable to allocate enough memory to perform Scrypt for these parameters at this time.");
                 }
             }
 
             IBuffer derivedKey = OneRoundPbkdf2Sha256(key, bufferData, derivedKeyLength);
 
-            Erase(bufferData);
+            scryptCore.EraseBuffer();
 
             return derivedKey;
         }
@@ -363,27 +363,7 @@ namespace Skryptonite
 
             return derivedKey;
         }
-
-        /// <summary>
-        /// Erases the content of the buffer.
-        /// </summary>
-        /// <param name="value">The buffer to erase.</param>
-        static void Erase(IBuffer value)
-        {
-            Contract.Ensures(value == null);
-
-            if (value == null)
-                return;
-
-            using (var writer = new DataWriter(value.AsStream().AsOutputStream()))
-            {
-                for (int i = 0; i < value.Length; i++)
-                    writer.WriteByte(0);
-
-                writer.StoreAsync().AsTask().GetAwaiter().GetResult();
-            }
-        }
-
+        
         #endregion
 
         #region Contract Methods

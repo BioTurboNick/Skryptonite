@@ -35,6 +35,12 @@ namespace Skryptonite
 			void SMix(unsigned elementIndex);
 
 			/**
+			<summary>Erases the buffer.</summary>
+			<remarks>Should be called after finishing Scrypt and deriving the final key.</remarks>
+			*/
+			void EraseBuffer();
+
+			/**
 			<summary>Gets the number of independent elements present in the buffer.</summary>
 			*/
 			property unsigned ElementsCount
