@@ -1,0 +1,89 @@
+﻿<Page
+    x:Class="Skryptonite.Sample.MainPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:Skryptonite.Sample"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d">
+
+    <StackPanel Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+        <StackPanel HorizontalAlignment="Center">
+            <TextBlock TextAlignment="Center">Run Scrypt</TextBlock>
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
+                </Grid.ColumnDefinitions>
+
+                <TextBlock>N:</TextBlock>
+                <TextBox Grid.Column="1" PlaceholderText="Iterations/Memory"></TextBox>
+
+                <TextBlock Grid.Row="1">r:</TextBlock>
+                <TextBox Grid.Row="1" Grid.Column="1" PlaceholderText="Sequential Multiplier"></TextBox>
+
+                <TextBlock Grid.Row="2">p:</TextBlock>
+                <TextBox Grid.Row="2" Grid.Column="1" PlaceholderText="Parallelization"></TextBox>
+
+                <TextBlock Grid.Row="3">Password:</TextBlock>
+                <TextBox Grid.Row="3" Grid.Column="1" PlaceholderText="Password"></TextBox>
+
+                <TextBlock Grid.Row="4">Salt:</TextBlock>
+                <TextBox Grid.Row="4" Grid.Column="1" PlaceholderText="Salt"></TextBox>
+
+                <TextBlock Grid.Row="5">Hashed Password:</TextBlock>
+                <TextBlock Grid.Row="5" Grid.Column="1"></TextBlock>
+            </Grid>
+            <Button HorizontalAlignment="Center">Run</Button>
+        </StackPanel>
+        <StackPanel HorizontalAlignment="Center">
+            <TextBlock TextAlignment="Center">Optimize Scrypt</TextBlock>
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
+                </Grid.ColumnDefinitions>
+
+                <TextBlock>Memory (MB):</TextBlock>
+                <TextBox Grid.Column="1"></TextBox>
+
+                <TextBlock Grid.Row="1">Time (s):</TextBlock>
+                <TextBox Grid.Row="1" Grid.Column="1"></TextBox>
+            </Grid>
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
+                </Grid.ColumnDefinitions>
+
+                <TextBlock>N:</TextBlock>
+                <TextBlock Name="OptimalNTextBlock" Grid.Column="1"></TextBlock>
+
+                <TextBlock Grid.Row="1">r:</TextBlock>
+                <TextBlock Name="OptimalRTextBlock" Grid.Row="1" Grid.Column="1"></TextBlock>
+
+                <TextBlock Grid.Row="2">p:</TextBlock>
+                <TextBlock Name="OptimalPTextBlock" Grid.Row="2" Grid.Column="1"></TextBlock>
+            </Grid>
+            <Button HorizontalAlignment="Center" Tapped="OptimizeButton_Tapped">Optimize</Button>
+        </StackPanel>
+    </StackPanel>
+</Page>
