@@ -29,7 +29,7 @@ namespace Skryptonite.Sample
             this.InitializeComponent();
         }
 
-        private async void OptimizeButton_Tapped(object sender, TappedRoutedEventArgs e)
+        private void OptimizeButton_Tapped(object sender, TappedRoutedEventArgs e)
         {
             //var scrypt = await Task.Run(() => Scrypt.CreateOptimal(16 * 1024 * 1024, 5000));
             var scrypt = Scrypt.CreateOptimal(16 * 1024 * 1024, 5000);

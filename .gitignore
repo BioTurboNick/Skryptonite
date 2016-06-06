@@ -215,3 +215,4 @@ ModelManifest.xml
 *.VC.opendb
 /Skryptonite/nuget.exe
 *.db
+/Skryptonite/Nuget/nuget.exe

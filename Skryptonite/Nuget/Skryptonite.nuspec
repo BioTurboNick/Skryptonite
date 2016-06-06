@@ -23,7 +23,7 @@
   <files>
     <file src="build\uap10.0\Skryptonite.targets" target="build\native" />
     
-    <file src="..\bin\x86\Release\Skryptonite.XML" target="lib\uap10.0" />
+    <file src="..\bin\Reference\Skryptonite.XML" target="lib\uap10.0" />
     <file src="..\bin\Reference\Skryptonite.winmd" target="lib\uap10.0" />
     <file src="..\bin\Reference\Skryptonite.Native.winmd" target="lib\uap10.0" />
     
