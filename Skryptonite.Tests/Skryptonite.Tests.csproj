@@ -91,6 +91,7 @@
   <ItemGroup>
     <!--A reference to the entire .Net Framework and Windows SDK are automatically included-->
     <None Include="project.json" />
+    <None Include="Skryptonite.Tests_TemporaryKey.pfx" />
     <SDKReference Include="MSTestFramework.Universal, Version=$(UnitTestPlatformVersion)" />
     <SDKReference Include="TestPlatform.Universal, Version=$(UnitTestPlatformVersion)" />
   </ItemGroup>
@@ -111,7 +112,6 @@
     <AppxManifest Include="Package.appxmanifest">
       <SubType>Designer</SubType>
     </AppxManifest>
-    <None Include="Skryptonite.Tests_TemporaryKey.pfx" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Properties\UnitTestApp.rd.xml" />

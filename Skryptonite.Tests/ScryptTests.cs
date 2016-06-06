@@ -9,7 +9,7 @@ namespace Skryptonite.Tests
 {
     [TestClass]
     public class ScryptTests
-    {
+    { 
         void Scrypt_Test_Vectors()
         {
             IBuffer output0 = new Scrypt(1, 16, 1).DeriveKey(new Windows.Storage.Streams.Buffer(0), new Windows.Storage.Streams.Buffer(0), 64);
@@ -36,6 +36,7 @@ namespace Skryptonite.Tests
             }
             catch (OutOfMemoryException)
             {
+                Assert.Inconclusive("Not enough memory was available to complete the 1 GB test; all others passed.");
             }
             
         }
@@ -50,7 +51,7 @@ namespace Skryptonite.Tests
 
             scrypt = Scrypt.CreateOptimal(1073741824, 0);
 
-            Assert.AreEqual((uint)16, scrypt.ProcessingCost);
+            Assert.IsTrue(scrypt.ProcessingCost >= 16);
             Assert.AreEqual((uint)16, scrypt.ElementLengthMultiplier);
         }
 
