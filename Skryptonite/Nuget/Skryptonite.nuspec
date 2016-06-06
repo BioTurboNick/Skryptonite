@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
   <metadata minClientVersion="3.2">
     <id>Skryptonite</id>
-    <version>1.0.1</version>
+    <version>1.0.2</version>
     <title>Skryptonite</title>
     <authors>Nicholas C. Bauer</authors>
     <owners>Nicholas C. Bauer</owners>
@@ -10,10 +10,13 @@
     <projectUrl>https://github.com/BioTurboNick/Skryptonite</projectUrl>
     <requireLicenseAcceptance>true</requireLicenseAcceptance>
     <description>
-      A C#-wrapped native implementation of the scrypt sequential memory-hard password-based key derivation function (PBKDF) invented by Colin Percival for Universal Windows Platform applications. x86, x64, and ARM binaries are available. Also provides a function to select optimal parameters for your memory/time requirements.
+      A C#-wrapped native implementation of the scrypt sequential memory-hard password-based key derivation function (PBKDF) invented by Colin Percival for Universal Windows Platform applications. Features: * x86, x64, and ARM binaries. * Exploits vector instructions for maximum performance. * Can harness multi-core processors if the parallelization parameter is > 1. * On x86 and x64, uses non-temporal prefetching and cache flushes to minimize cache thrashing and reduce potential for cache timing attacks. * Provides a function to select optimal parameters for your memory/time requirements.
     </description>
     <summary>C#/Native Scrypt UWP Component</summary>
-    <releaseNotes>Initial release.</releaseNotes>
+    <releaseNotes>
+      1.0.2 Fixed issue where the erase procedure could deadlock on the calling thread.
+      1.0.1 Initial release.
+    </releaseNotes>
     <copyright>Copyright 2016</copyright>
     <tags>Cryptography Security Scrypt PBKDF Native UWP</tags>
   </metadata>
