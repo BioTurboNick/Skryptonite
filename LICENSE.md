@@ -1,5 +1,7 @@
 Skryptonite - Scrypt component for UWP
+
 Copyright © 2016 Nicholas C. Bauer, Ph.D.
+
 E-mail: nicholasbauer@outlook.com
 
 This software component is licensed under the LGPL 3.0 (see below). But for your entertainment, here are the previous ad-hoc terms. Note that I'd still appreciate $$, and please do still file a bug report if any of those scenarios occur.
