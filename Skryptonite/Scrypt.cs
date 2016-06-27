@@ -1,5 +1,5 @@
 /**
- * Skryptonite - scrypt library for UWP
+ * Skryptonite - Scrypt library for UWP
  * Copyright © 2016 Nicholas C. Bauer, Ph.D.
  * 
  * This program is free software: you can redistribute it and/or modify

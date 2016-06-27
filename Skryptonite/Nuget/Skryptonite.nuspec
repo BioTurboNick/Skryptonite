@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
   <metadata minClientVersion="3.2">
     <id>Skryptonite</id>
-    <version>1.0.2</version>
+    <version>1.0.3</version>
     <title>Skryptonite - Scrypt for modern apps</title>
     <authors>Nicholas C. Bauer</authors>
     <owners>Nicholas C. Bauer</owners>
@@ -14,7 +14,7 @@
     </description>
     <summary>C#/Native Scrypt UWP Component</summary>
     <releaseNotes>
-      1.0.3 Harmonized version numbers between NuGet and the assembly, migrated license to LGPL 3.0.
+      1.0.3 Harmonized version numbers between NuGet and the library, migrated license to LGPL 3.0.
       1.0.2 Fixed issue where the erase procedure could deadlock on the calling thread.
       1.0.1 Initial release.
     </releaseNotes>
