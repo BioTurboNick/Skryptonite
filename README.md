@@ -6,7 +6,7 @@ nicholasbauer@outlook.com
 
 Provides a native implementation of the scrypt algorithm invented by Colin Percival for usage in Universal Windows Platform applications, managed by a C# wrapper. Implements both x86-64 and ARM vector operations for compatibility across platforms.
 
-If you find this library useful, please consider a donation: http://paypal.me/NicholasBauer/25.
+If you find this library or the code useful, please consider a donation: http://paypal.me/NicholasBauer/25. I put a lot of work into making sure the code was abstracted and documented as fully as possible. If you find anything unclear, please file an issue.
 
 Installation
 ------------
